@@ -1,0 +1,27 @@
+.goodsblock img{
+    width: 60%;
+    height: 100px;
+    margin: 0 auto;
+}
+.g_block
+{
+    height: 570px;
+    overflow: hidden;
+    overflow-y: scroll;
+}
+.goods_info
+{
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+.search_block
+{
+    margin-top: 30px;
+    margin-bottom: 30px;
+}
+.asy_block
+{
+    margin: 20px;
+    margin-left: 0;
+}

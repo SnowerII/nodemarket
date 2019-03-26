@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>库存详情</title>
+    <%- include("./headline") %>
+    <link rel="stylesheet" href="/stylesheets/goodslist.css">
+</head>
+<body>
+<%- include("./navbar",{title:"goodslist"}) %>
+    <div class="container container-fluid body_main">
+        <!-- <h2>welcome to list page</h2> -->
+        <div class="row">
+            <button id="new_classoption" class="btn btn-info option_btn" data-toggle="modal" data-target="#new_classmodal">新增品类</button>
+            <button id="del_classoption" class="btn btn-danger option_btn" data-toggle="modal" data-target="#del_classmodal">品类删除</button>
+            <button id="new_goodsoption" class="btn btn-info option_btn" data-toggle="modal" data-target="#new_goodsmodal">新商品登录</button>
+            <button id="rec_goodsoption" class="btn btn-info option_btn">商品恢复</button>
+        </div>
+        <div class="row search_block">
+        <% goodsclass.map((item,index)=>{ %>
+            <button class="btn btn-default search_class"><%- item.name %></button>
+        <% }) %>
+            <div class="row pull-right">
+                <form id="search_form" onsubmit="return false;">
+                    <input name="goodsname" type="text" placeholder="在此输入商品名" style="height:34px;">
+                    <button class="save btn btn-default">查询</button>
+                </form>
+            </div>
+        
+        </div>
+        <div class="row asy_block">
+            <button asyname="price" asyvalue='1' class="asy_btn btn btn-default">价格升序</button>
+            <button asyname="name" asyvalue='1' class="asy_btn btn btn-default">名称升序</button>
+            <button asyname="price" asyvalue='-1' class="asy_btn btn btn-default">价格降序</button>
+            <button asyname="name" asyvalue='-1' class="asy_btn btn btn-default">名称降序</button>
+        </div>
+ 
+        <div class="container-fluid g_block" classvalue="">
+        <% goodsdata.map((item,index)=>{ %>
+        <div goodsid="<%- item.id %>" class="col-md-3 col-lg-3 col-xs-6 col-sm-4 show_goods">
+            <div class="thumbnail goodsblock">
+                <img src="<%- item.img %>">
+                <div class="caption">
+                    <h4 class="text-primary goods_info g_name" val="<%- item.name %>">商品名:<%- item.name %></h4>
+                    <p class="text-info g_num" val="<%- item.storage %>">库存量:<%- item.storage %></p>
+                    <p class="text-danger g_price" val="<%- item.price %>">价格:￥<%- item.price %></p>
+                    <button goodsid='<%- item.id %>' class="del_goodsoption btn btn-danger" data-toggle="modal" data-target="#del_goodsmodal">商品下架</button>
+                    <button goodsid='<%- item.id %>' class="upd_goodsoption btn btn-primary" data-toggle="modal" data-target="#upd_goodsmodal">数据修改</button>
+                </div>
+            </div>
+        </div>
+        <% }) %>
+        </div>
+    </div>
+
+    <div class="modal fade" tabindex="-1" role="dialog" id="new_classmodal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">新增品类</h4>
+                </div>
+                <form id="new_classform" method="POST" onsubmit="return false;">
+                    <div class="modal-body text-center">
+                        <div class="form-group">
+                            <label for="new_classinput">新增类名</label>
+                            <input name="new_class" id="new_classinput" type="text" placeholder="输入新增的商品类名">
+                        </div>
+                        <div class="form-group">
+                            <label for="new_classreason">新增原因</label>
+                            <input name="new_classreason" id="new_classreason" type="text" placeholder="输入新增原因">
+                        </div>
+                    </div>
+                    <div class="modal-footer text-center">
+                        <button class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button class="btn btn-primary save">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="del_classmodal">
+            <div class="modal-dialog text-center" role="document">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                        <h4 class="modal-title">删除品类</h4>
+                    </div>
+                    <form id="del_classform" method="POST" onsubmit="return false;">
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label for="del_classselect">请选择:</label>
+                                <select id="del_classselect" name="del_classname">
+                                    <option value="0">--请选择删除的品类--</option>
+                                    <% goodsclass.map((item,index)=>{ %>
+                                        <option value="<%- item.name %>"><%- item.name %></option>
+                                    <% }) %>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="del_classreason">删除品类原因:</label>
+                                <input type="text" id="del_classreason" name="del_classreason">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button class="btn btn-default" data-dismiss="modal">取消</button>
+                            <button class="btn btn-primary save">保存</button>
+                        </div>
+                    </form>
+                    
+                </div>
+            </div>
+        </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="new_goodsmodal">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">商品新增</h4>
+                </div>
+                <form onsubmit="return false;" method="POST" id="add_goodsform" enctype="multipart/form-data">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="add_pic">图片:</label>
+                        <input type="file" accept="image/*" name="add_pic" id="add_pic" class="form-control">
+                    </div>
+                    <div class="form-group">
+                        <label for="add_price">价格:</label>
+                        <input type="number" id="add_price" class="form-control" step="0.1" name="add_price">
+                    </div>
+                    <div class="form-group">
+                        <label for="add_classselect">类型:</label>
+                        <select class="form-control" id="add_classselect" name="add_classname">
+                            <option value="0">--请选择类属品类--</option>
+                            <% goodsclass.map((item,index)=>{ %>
+                                <option value="<%- item.name %>"><%- item.name %></option>
+                            <% }) %>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="add_num">现有库存:</label>
+                        <input type="number" id="add_num" name="add_num" class="form-control">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button class="btn btn-primary save">保存</button>
+                </div>
+            </form>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="del_goodsmodal" goodsid="">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">商品下架</h4>
+                </div>
+                <div class="modal-body">
+                    <p>确定要下架商品吗？</p>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-default" data-dismiss="modal">取消</button>
+                    <button goodsid="" class="btn btn-primary save">保存</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="upd_goodsmodal" goodsid="">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title">商品修改</h4>
+                </div>
+                <form method="POST" onsubmit="return false;" id="upd_goodsform" class="text-center">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="upd_name">商品名:</label>
+                            <input id="upd_name" type="text" name="goodsname" class="upd_name" disabled readonly="readonly">
+                        </div>
+                        <div class="form-group">
+                            <label for="upd_num">库存量:</label>
+                            <input id="upd_num" type="number" name="goodsnum" class="upd_num">
+                        </div>
+                        <div class="form-group">
+                            <label for="upd_price">单价:￥</label>
+                            <input id="upd_price" type="number" step="0.1" name="goodsprice" class="upd_price">
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button class="btn btn-default" data-dismiss="modal">取消</button>
+                        <button goodsid="" class="btn btn-primary save">保存</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+</body>
+<%- include("./footline",{name:loginname}) %>
+<script src="../javascripts/module.js"></script>
+<script>
+// 表单验证模板
+$(function(){
+    $('#new_classform').bootstrapValidator({
+　　　　　　　　message: 'This value is not valid',
+            　feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                new_class: {
+                    message: '品类添加失败失败',
+                    validators: {
+                        notEmpty: {
+                            message: '品类名不能为空'
+                        }
+                    }
+                }
+            }
+        });
+
+    $("#del_classform").bootstrapValidator({
+        message: 'This value is not valid',
+            　feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                del_classname:{
+                    message:"删除品类失败",
+                    validators:{
+                        notEmpty:{
+                            message:"删除项不能为空"
+                        },
+                        callback:{
+                            message:"请选择需要删除的类",
+                            callback:function(value,validator){
+                                if(value=="0")
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+    })
+    $("#add_goodsform").bootstrapValidator({
+        message: 'This value is not valid',
+            feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                add_pic:{
+                    validators: {
+                    notEmpty: {
+                        message: '上传图片不能为空'
+                    },
+                    file: {
+                        extension: 'png,jpg,jpeg',
+                        type: 'image/png,image/jpg,image/jpeg',
+                        message: '请重新选择图片'
+                    }
+                }
+                },
+                add_classname:{
+                    message:"品类选择错误",
+                    validators:{
+                        notEmpty:{
+                            message:"品类选择不能为空"
+                        },
+                        callback:{
+                            message:"请选择需要删除的类",
+                            callback:function(value,validator){
+                                if(value=="0")
+                                {
+                                    return false;
+                                }
+                                else
+                                {
+                                    return true;
+                                }
+                            }
+                        }
+                    }
+                },
+                add_num:{
+                    message:"库存填写有误",
+                    validators:{
+                        notEmpty:{
+                            message:"库存不能为空"
+                        }
+                    }
+                },
+                add_price:{
+                    message:"价格填写有误",
+                    validators:{
+                        notEmpty:{
+                            message:"价格不能为空"
+                        }
+                    }
+                }
+            }
+    })
+    $("#upd_goodsform").bootstrapValidator({
+            message: 'This value is not valid',
+            feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                goodsnum: {
+                    message: '库存量错误',
+                    validators: {
+                        notEmpty: {
+                            message: '库存量不能为空'
+                        }
+                    }
+                },
+                goodsprice:{
+                    message:"单价错误",
+                    validators:{
+                        notEmpty:{
+                            message:"价格不能为空"
+                        }
+                    }
+                }
+            }
+    })
+});
+
+    $(".search_class").bind("click",function(){
+        $(".g_block").attr("classvalue",$(this).html());
+        var send = $(this).html();
+        $.ajax({
+            url:"/users/searchclass",
+            dataType:"json",
+            type:"post",
+            data:{"classname":send},
+            success:function(data)
+            {
+                $(".show_goods").remove();
+                for(var i =0;i<data.length;i++)
+                {
+                    $("<div goodsid="+data[i].id+" class='col-md-3 col-lg-3 col-xs-6 col-sm-4 show_goods'>").html(`
+                        <div class="thumbnail goodsblock">
+                        <img src="${data[i].img}">
+                        <div class="caption">
+                            <h4 class="text-primary goods_info g_name" val="${data[i].name}">商品名:${data[i].name}</h4>
+                            <p class="text-info g_num" val="${data[i].storage}">库存量:${data[i].storage}</p>
+                            <p class="text-danger g_price" val="${data[i].price}">价格:￥${data[i].price}</p>
+                            <button class="del_goodsoption btn btn-danger" goodsid=${data[i].id} data-toggle="modal" data-target="#del_goodsmodal">商品下架</button>
+                            <button goodsid='${data[i].id}' class="upd_goodsoption btn btn-primary" data-toggle="modal" data-target="#upd_goodsmodal">数据修改</button>
+                        </div>
+                    </div>
+                    `).appendTo(".g_block");
+                }
+            },
+            error:function(e)
+            {
+                console.log(e);
+            }
+        })
+    })
+
+    $(".del_goodsoption").on("click",function(event){
+        $("#del_goodsmodal .save").attr("goodsid",$(this).attr("goodsid"));
+    })
+    $("#del_goodsmodal .save").bind("click",function(){
+        var id = $(this).attr("goodsid");
+        $.ajax({
+            type:"post",
+            url:"/users/downgoods",
+            dataType:"json",
+            data:{"goodsid":$(this).attr("goodsid")},
+            success:function(data)
+            {
+                $(".show_goods[goodsid|="+id+"]").remove();
+                $("#del_goodsmodal").modal("hide");
+            }
+        })
+    })
+
+    $(".asy_btn").bind("click",function(){
+        $.ajax({
+        type:"post",
+        url:"/users/asygoods",  
+        dataType:"json",
+        data:{"type":$(".g_block").attr("classvalue"),"asyname":$(this).attr("asyname"),"asyvalue":$(this).attr("asyvalue")*1},  
+        success:function(data)
+        {
+            $(".show_goods").remove();
+            for(var i =0;i<data.length;i++)
+            {
+                $("<div goodsid="+data[i].id+" class='col-md-3 col-lg-3 col-xs-6 col-sm-4 show_goods'>").html(`
+                    <div class="thumbnail goodsblock">
+                    <img src="${data[i].img}">
+                    <div class="caption">
+                            <h4 class="text-primary goods_info g_name" val="${data[i].name}">商品名:${data[i].name}</h4>
+                            <p class="text-info g_num" val="${data[i].storage}">库存量:${data[i].storage}</p>
+                            <p class="text-danger g_price" val="${data[i].price}">价格:￥${data[i].price}</p>
+                        <button class="del_goodsoption btn btn-danger" goodsid=${data[i].id} data-toggle="modal" data-target="#del_goodsmodal">商品下架</button>
+                        <button goodsid='${data[i].id}' class="upd_goodsoption btn btn-primary" data-toggle="modal" data-target="#upd_goodsmodal">数据修改</button>
+                    </div>
+                </div>
+                `).appendTo(".g_block");
+            }
+        }
+        })
+    })
+
+    $("#new_classform .save").bind("click",function(){
+        if($("#new_classform").data("bootstrapValidator").isValid()){
+
+        
+        $.ajax({
+        type:"post",
+        url:"/users/newclass",
+        dataType:"json",
+        data:$("#new_classform").serialize(),
+        success:function(data)
+        {
+            alert(data.msg);
+            window.location.reload();
+        },
+        error:function(e)
+        {
+          console.log(e);
+        }
+      });
+    }
+    })
+
+    $("#add_goodsform .save").bind("click",function(){
+        if($("#add_goodsform").data("bootstrapValidator").isValid())
+        {
+            var formdata = new FormData("#add_goodsform")[0];
+            $.ajax({
+            type:"post",
+            url:"/users/addgoods",
+            dataType:"json",
+            data:formdata,
+            async: false,  
+            cache: false,  
+            contentType: false,  
+            processData: false, 
+            success:function(data)
+            {
+                alert(data.msg);
+                window.location.reload();
+            },
+            error:function(e)
+            {
+                console.log(e);
+            }
+      });
+    }
+    })
+   
+    $("#del_classform .save").bind("click",function(){
+        if($("#del_classform").data("bootstrapValidator").isValid())
+        {
+        $.ajax({
+        type:"post",
+        url:"/users/delclass",
+        dataType:"json",
+        data:$("#del_classform").serialize(),
+        success:function(data)
+        {
+            alert(data.msg);
+            window.location.reload();
+        },
+        error:function(e)
+        {
+          console.log(e);
+        }
+        });
+        }
+    })
+
+    $("#rec_goodsoption").bind("click",function(){
+        $.ajax({
+            type:"post",
+            url:"/users/recgoods",
+            dataType:"json",
+            success:function(data)
+            {
+               $(".show_goods").remove();
+                for(var i =0;i<data.length;i++)
+                {
+                    $("<div goodsid="+data[i].id+" class='col-md-3 col-lg-3 col-xs-6 col-sm-4 show_goods'>").html(`
+                        <div class="thumbnail goodsblock">
+                        <img src="${data[i].img}">
+                        <div class="caption">
+                            <h4 class="text-primary goods_info g_name" val="${data[i].name}">商品名:${data[i].name}</h4>
+                            <p class="text-info g_num" val="${data[i].storage}">库存量:${data[i].storage}</p>
+                            <p class="text-danger g_price" val="${data[i].price}">价格:￥${data[i].price}</p>
+                            <button goodsid='${data[i].id}' class="clear btn btn-danger" >彻底删除</button>
+                            <button goodsid='${data[i].id}' class="recovery btn btn-success" >恢复上架</button>
+                        </div>
+                    </div>
+                    `).appendTo(".g_block");
+                }
+            }
+        })
+    })
+    
+    $(".g_block").on("click",".clear",function(){
+        if(confirm("警告:确定彻底删除此商品吗?"))
+        {
+            var id = $(this).attr("goodsid")*1;
+            $.ajax({
+                type:"post",
+                url:"/users/clear",
+                dataType:"json",
+                data:{"goodsid":id},
+                success:function(data)
+                {
+                    $(".show_goods[goodsid|="+id+"]").remove();
+                }
+            })
+        }
+    })
+    $(".g_block").on("click",".recovery",function(){
+        if(confirm("恢复上架吗？"))
+        {
+            var id = $(this).attr("goodsid")*1;
+            $.ajax({
+                type:"post",
+                url:"/users/recovery",
+                dataType:"json",
+                data:{"goodsid":id},
+                success:function(data)
+                {
+                    $(".show_goods[goodsid|="+id+"]").remove();
+                }
+            })
+        }
+    })
+
+    $(".g_block").on("click",".upd_goodsoption",function(){
+        var id = $(this).attr("goodsid");
+        var name = $(".show_goods[goodsid|="+id+"] .g_name").attr("val");
+        var num = $(".show_goods[goodsid|="+id+"] .g_num").attr("val");
+        var price = $(".show_goods[goodsid|="+id+"] .g_price").attr("val");
+       
+        $("#upd_goodsmodal .upd_name").val(name);
+        $("#upd_goodsmodal .upd_num").val(num);
+        $("#upd_goodsmodal .upd_price").val(price);
+        $("#upd_goodsmodal .save").attr("goodsid",id);
+    })
+    $("#upd_goodsmodal .save").on("click",function(){
+
+        if($("#upd_goodsform").data("bootstrapValidator").isValid()){
+        var id = $(this).attr("goodsid")*1;
+        var num = $("#upd_goodsmodal .upd_num").val();
+        var price = $("#upd_goodsmodal .upd_price").val();
+
+        $.ajax({
+                type:"post",
+                url:"/users/updgoods",
+                dataType:"json",
+                data:{"goodsid":id,"goodsnum":num,"goodsprice":price},
+                success:function(data)
+                {
+                    alert(data.msg);
+                    window.location.reload();
+                }
+            })    
+        }
+    })
+
+    $("#search_form .save").bind("click",function(){
+        $.ajax({
+        type:"post",
+        url:"/users/search",
+        dataType:"json",
+        data:$("#search_form").serialize(),
+        success:function(data)
+        {
+            $(".show_goods").remove();
+            for(var i =0;i<data.length;i++)
+            {
+                $("<div goodsid="+data[i].id+" class='col-md-3 col-lg-3 col-xs-6 col-sm-4 show_goods'>").html(`
+                    <div class="thumbnail goodsblock">
+                    <img src="${data[i].img}">
+                    <div class="caption">
+                        <h4 class="text-primary goods_info g_name" val="${data[i].name}">商品名:${data[i].name}</h4>
+                        <p class="text-info g_num" val="${data[i].storage}">库存量:${data[i].storage}</p>
+                        <p class="text-danger g_price" val="${data[i].price}">价格:￥${data[i].price}</p>
+                        <button class="del_goodsoption btn btn-danger" goodsid='${data[i].id}' data-toggle="modal" data-target="#del_goodsmodal">商品下架</button>
+                        <button goodsid='${data[i].id}' class="upd_goodsoption btn btn-primary" data-toggle="modal" data-target="#upd_goodsmodal">数据修改</button>
+                    </div>
+                </div>
+                `).appendTo(".g_block");
+            }
+        },
+      });   
+    })
+
+
+</script>
+</html>

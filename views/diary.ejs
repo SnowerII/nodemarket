@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>留言板</title>
+    <%- include("./headline") %>
+    <link rel="stylesheet" href="/stylesheets/diary.css">
+  </head>
+  <body>
+    <%- include("./navbar",{title:"diary"}) %>
+    <div class="container container-fluid home_main body_main">
+        <div class="asy">
+            <button asynum='-1' class="btn btn-default asybtn">最新的</button>
+            <button asynum='1' class="btn btn-default asybtn">最老的</button>
+        </div>
+        <div class="row show container-fluid">
+            <h2>留言</h2>
+            <div class="row shows">
+            <% if(result.length>0){ %>
+            <% result.map((item,index)=>{ %>
+            <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                <div class="thumbnail show_block">
+                    <div class="show_title">
+                        <h3 class="text-primary"><%- item.title %></h3>
+                    </div>
+                    <div class="show_date">
+                        <p class="text-info text-right"><%- item.time %></p>
+                    </div>
+                    <div class="show_content">
+                        <p class="text-default"><%- item.content %></p>
+                    </div>
+                    <div class="show_name">
+                        <span class="text-info">留言人:<%- item.username %></span>
+                    </div>
+                    <% if(loginid == 0){ %>
+                    <a><p class="text-primary text-right del" showid="<%- item.id %>">删除</p></a>
+                    <% } %>
+                </div>
+            </div>
+            <% }) %>
+            <% }else{ %>
+                <div class="row">
+                    <p class="text-primary text-center">留言板暂无消息,请添加</p>
+                </div>
+            <% } %>
+            </div>
+            <div asynum="-1" pagenum="<%- pagenum %>" totalpage="<%- totalpage %>" class="pages col-md-12 col-lg-12 col-sm-12 col-xs-12">
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-lg">
+                        <li>
+                        <a class="page_btn" type="last" need="-1" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </a>
+                        </li>
+                    <%    if(pagenum>2){   %>
+                            <li ><a class="page_btn page_num" need="-2" ><%- pagenum-2 %></a></li>
+                    <%    }   %>
+                    <%    if(pagenum>1){   %>
+                        <li><a class="page_btn page_num" need="-1" ><%- pagenum-1 %></a></li>
+                    <%    }   %>
+                        <li class="active"><a class="page_btn page_active page_num" need="0" ><%- pagenum %></a></li>
+                    <%    if(pagenum<=totalpage-1){   %>
+                        <li><a class="page_btn page_num" need="1" ><%- pagenum+1 %></a></li>
+                    <%    }   %>
+                    <%    if(pagenum<=totalpage-2){   %>
+                        <li><a class="page_btn" page_num need="2" ><%- pagenum +2  %></a></li>
+                    <%    }   %>
+                        <li>
+                        <a class="page_btn" type="next" need="1" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </a>
+                        </li>
+                    </ul>
+                </nav>
+                <div class="pages_count row">
+                    <span class="cpages">总共<%- totalpage %>页</span>
+                    <span class="cc"><%- count %>条</span>
+                </div>
+            </div>
+        </div>
+        <div class="row write container-fluid">
+            <h2>添加新留言</h2>
+            <form id="write_form" onsubmit="return false;" class="col-lg-12 col-md-12 col-xs-12 col-sm-12">
+                <div class="form-group">
+                    <label for="write_title">标题:</label>
+                    <input class="form-control" type="text" name="title" id="write_title" maxlength="25">
+                </div>
+                <div class="form-group">
+                    <textarea class="form-control" maxlength="60" placeholder="请输入不超过60个字" name="content" id="write_content" rows="6"></textarea>
+                </div>
+                <button class="btn btn-info submit">发布</button>
+            </form>
+        </div>
+    </div>
+  </body>
+  <%- include("./footline",{name:loginname}) %>
+  <script src="../javascripts/module.js"></script>
+  <script>
+      $(function(){
+        $('#write_form').bootstrapValidator({
+　　　　　　　　message: 'This value is not valid',
+            　feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                title: {
+                    message: '留言标题错误',
+                    validators: {
+                        notEmpty: {
+                            message: '标题不能为空'
+                        }
+                    }
+                },
+                content:{
+                    message: "留言内容错误",
+                    validators:{
+                        notEmpty:{
+                            message: "内容不能为空"
+                        }
+                    }
+                }
+            }
+        });
+      })
+
+      $("#write_form .submit").bind("click",function(){
+        if($("#write_form").data("bootstrapValidator").isValid())
+        {
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/diary/commonwrite",
+            data:$("#write_form").serialize(),
+            success:function(data)
+            {
+                alert(data.msg);
+                window.location.reload();
+            }
+        })
+        }
+      })
+
+      $(".asy .asybtn").bind("click",function(){
+        $(".pages").attr("asynum",$(this).attr("asynum"));
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/diary/asy",
+            data:{"asyvalue":$(this).attr("asynum")},
+            success:function(data)
+            {
+                $(".shows").empty();
+                if(data.result.length>0)
+                {
+                    data.result.map((item,index)=>{
+                        $(".shows").append(`
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="thumbnail show_block">
+                            <div class="show_title">
+                                <h3 class="text-primary">${item.title}</h3>
+                            </div>
+                            <div class="show_date">
+                                <p class="text-info text-right">${item.time}</p>
+                            </div>
+                            <div class="show_content">
+                                <p class="text-default">${item.content}</p>
+                            </div>
+                            <div class="show_name">
+                                <span class="text-info">留言人:${item.username}</span>
+                            </div>
+                            <% if(loginid == 0){ %>
+                            <a><p class="text-primary text-right del" showid="${item.id}">删除</p></a>
+                            <% } %>
+                        </div>
+                        </div>
+                        `);
+                    })
+                }
+                else
+                {
+                    $(".shows").append($("<h2>").html("暂无留言，快去添加吧！"));
+                }
+            }
+        })
+      })
+
+      $(".page_btn").bind("click",function(){
+
+        var need = $(this).attr("need")*1;
+        var pagenum = $(".pages").attr("pagenum")*1;
+        var totalpage = $(".pages").attr("totalpage")*1;
+        var type = $(this).attr("type");
+        var send = 0;
+        if(!type)
+        {
+            send = pagenum+need;
+        }
+        else if(type=="last")
+        {
+            send = pagenum>1 ? pagenum-1:1;
+        }
+        else if(type=="next")
+        {
+            send = pagenum<totalpage ? pagenum+1 : totalpage;
+        }
+        $.ajax({
+            type:"post",
+            dataType:"json",
+            url:"/diary/asy",
+            data:{"asyvalue":$(".pages").attr("asynum"),"pagenum":send},
+            success:function(data)
+            {
+                $(".pages").attr("pagenum",data.pagenum);
+                $(".pages").attr("totalpage",data.totalpage);
+                $(".page_num").each(function(){
+                    $(this).html($(".pages").attr("pagenum")*1+$(this).attr("need")*1);
+                })
+                $(".shows").empty();
+                if(data.result.length>0)
+                {
+                    data.result.map((item,index)=>{
+                        $(".shows").append(`
+                        <div class="col-lg-4 col-md-4 col-sm-6 col-xs-12">
+                        <div class="thumbnail show_block">
+                            <div class="show_title">
+                                <h3 class="text-primary">${item.title}</h3>
+                            </div>
+                            <div class="show_date">
+                                <p class="text-info text-right">${item.time}</p>
+                            </div>
+                            <div class="show_content">
+                                <p class="text-default">${item.content}</p>
+                            </div>
+                            <div class="show_name">
+                                <span class="text-info">留言人:${item.username}</span>
+                            </div>
+                            <% if(loginid == 0){ %>
+                            <a><p class="text-primary text-right del" showid="${item.id}">删除</p></a>
+                            <% } %>
+                        </div>
+                        </div>
+                        `);
+                    })
+                }
+                else
+                {
+                    $(".shows").append($("<h2>").html("暂无留言，快去添加吧！"));
+                }
+            }
+          })
+      })
+
+      $(".shows").on("click",".del",function(){
+          if(confirm("确定删除此条留言吗？"))
+          {
+              $.ajax({
+                type:"post",
+                dataType:"json",
+                url:"/diary/commondel",
+                data:{"delid":$(this).attr("showid")},
+                success:function(data)
+                {
+                    alert(data.msg);
+                    window.location.reload();
+                }
+              })
+          }
+      })
+  </script>
+</html>

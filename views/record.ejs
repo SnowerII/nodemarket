@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>修改记录</title>
+    <%- include("./headline") %>
+  </head>
+  <body>
+    <%- include("./navbar",{title:"record"}) %>
+    <div class="container container-fluid home_main body_main">
+    <div class="row text-center">
+      <h2>记录</h3>
+    </div class="table_show">
+    <% if(result.length>0){ %>
+    <table class="rec_table table table-hover">
+      <tr>
+        <th>序号</th>
+        <th>人员</th>
+        <th>人员ID</th>
+        <th>类型</th>
+        <th>操作</th>
+        <th>理由</th>
+        <th>时间</th>
+        <th></th>
+      </tr>
+      <% result.map((item,index)=>{ %>
+        <tr>
+          <td class="info"><%- index+1 %></td>
+          <td><%- item.operator %></td>
+          <td class="success"><%- item.operatorid %></td>
+          <td><%- item.type %></td>
+          <td class="active"><%- item.operate %></td>
+          <td><%- item.reason %></td>
+          <td class="warning"><%- item.time %></td>
+          <td recid="<%- item.id %>" class="del_rec"><a>删除</a></td>
+        </tr>
+      <% }) %>
+    </table>
+    <% }else{ %>
+    <h2 class="text-center">暂无记录</h2>
+    <% } %>
+    </div>
+    <div class="row pages text-center" style="margin-top:30px;">
+        <nav aria-label="Page navigation">
+            <ul class="pagination pagination-lg">
+                <li>
+                <a href="/record?pagenum=<%- pagenum>1 ? pagenum-1:1 %>" aria-label="Previous">
+                    <span aria-hidden="true">&laquo;</span>
+                </a>
+                </li>
+            <%    if(pagenum>2){   %>
+                    <li ><a href="/record?pagenum=<%- pagenum -2 %>"><%- pagenum-2 %></a></li>
+            <%    }   %>
+            <%    if(pagenum>1){   %>
+                <li><a href="/record?pagenum=<%- pagenum-1 %>"><%- pagenum-1 %></a></li>
+            <%    }   %>
+                <li class="active"><a href="/record?pagenum=<%- pagenum %>"><%- pagenum %></a></li>
+            <%    if(pagenum<=totalpage-1){   %>
+                <li><a href="/record?pagenum=<%- pagenum+1 %>"><%- pagenum+1 %></a></li>
+            <%    }   %>
+            <%    if(pagenum<=totalpage-2){   %>
+                <li><a href="/record?pagenum=<%- pagenum+2 %>"><%- pagenum +2  %></a></li>
+            <%    }   %>
+                <li>
+                <a href="/record?pagenum=<%- pagenum<totalpage ? pagenum+1 : totalpage   %>" aria-label="Next">
+                    <span aria-hidden="true">&raquo;</span>
+                </a>
+                </li>
+            </ul>
+        </nav>
+        <div class="pages_count row">
+            <span class="cpages">总共<%- totalpage %>页</span>
+            <span class="cc"><%- count %>条</span>
+        </div>
+    </div>
+  </body>
+  <%- include("./footline",{name:loginname}) %>
+  <script src="../javascripts/module.js"></script>
+  <script>
+    $(".del_rec").bind("click",function(){
+      if(confirm("确定删除这条记录吗"))
+      {
+        var id = $(this).attr("recid");
+        $.ajax({
+          type:"post",
+          dataType:"json",
+          url:"/record/delrec",
+          data:{"recid":id},
+          success:function(data)
+          {
+            window.location.reload();
+          }
+        })
+      }
+    })
+  </script>
+</html>

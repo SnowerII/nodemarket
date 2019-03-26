@@ -1,0 +1,40 @@
+.show{
+    margin: 0 auto;
+    min-height: 600px;
+    position: relative;
+}
+
+.write{
+    margin: 0 auto;
+}
+
+.pages{
+    margin-top: 20px;
+    margin-bottom: 60px;
+}
+
+.show_block{
+    border: 1px solid lightblue;
+    border-radius: 5px;
+}
+.show_title
+{
+    min-height: 37px;
+    border-bottom: 1px solid lightblue;
+}
+.show_date p
+{
+    padding-top: 5px;
+    padding-bottom: 5px;
+    line-height: 16px;
+    font-size: 16px;
+    border-bottom: 1px solid lightblue;
+}
+.show_content
+{
+    height: 110px;
+    border-radius: 10px;
+    padding-top: 20px;
+    padding-bottom: 20px;
+    
+}

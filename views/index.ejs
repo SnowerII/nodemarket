@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= title %></title>
+    <%- include("./headline") %>
+    <link rel="stylesheet" href="../stylesheets/index.css">
+  </head>
+  <body>
+    <%- include("./navbar",{title:"home"}) %>
+    <div class="container container-fluid home_main body_main">
+      <div class="row home_title">
+        <h1 class="text-center"><%= title %></h1>
+      </div>
+      <% if(loginname){ %>
+        <div class="row welcome" data-loginname="<%- loginname %>">
+          <h2 class="text-center">Welcome</h2>
+        </div>
+        <div class="container-fluid chat_block">
+          <h3 class="text-primary chat_title">交流</h3>
+          <div class="row chat_window">
+            <div class="chat_blank">
+              <p class="text-center">.....</p>
+            </div>
+            <div class="chat_show"></div>
+            <div class="chat_write">
+              <textarea placeholder="输入内容" class="chat_input" rows="20"></textarea>
+            </div>
+            <div class="chat_control text-center">
+              <button class="btn btn-default clear">清空</button>
+              <button class="btn btn-default send">发送</button>
+            </div>
+          </div>
+        </div>
+      <% }else{ %>
+      <form id="login_form" method="POST" class="col-lg-6 col-md -6 col-sm-6 col-xs-12 col-lg-offset-3 col-md-offset-3 col-sm-offset-3">
+          <div class="form-group">
+              <label for="login_nameinput">用户名</label>
+              <input type="text" value="<%- loginname %>" class='form-control' id="login_nameinput" name="username" placeholder="用户名">
+          </div>
+          <div class="form-group">
+              <label for="login_pwdinput">密码</label>
+              <input type="password" class="form-control" id="login_pwdinput" name="userpwd" placeholder="密码">
+          </div>
+          <div class="text-center" style="margin-top:20px;">
+              <button type="button" class="btn btn-primary" style="margin-right:10px;" id="login_btn">登录</button>
+              <button type="button" class="btn btn-info" data-toggle="modal" data-target="#register">去注册</button>
+          </div>
+      </form>
+      <% } %>
+    </div>
+    <div class="modal fade" tabindex="-1" role="dialog" id="register">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+              <h4 class="modal-title">注册一个员工账号</h4>
+            </div>
+            <form onsubmit="return false;" method="POST" class="register_form">
+              <div class="modal-body">
+                  <div class="form-group">
+                      <label for="nameinput">用户名(6-10位):</label>
+                      <input type="text" class='form-control' id="nameinput" name="username" placeholder="用户名">
+                  </div>
+                  <div class="form-group">
+                      <label for="phoneinput">手机号:</label>
+                      <input type="text" class='form-control' id="phoneinput" name="userphone" placeholder="手机号">
+                  </div>
+                  <div class="form-group">
+                      <label for="pwdinput">密码(6-10位):</label>
+                      <input type="password" class="form-control" id="pwdinput" name="userpwd" placeholder="密码">
+                  </div>
+                  <div class="form-group">
+                      <label for="codeinput">验证码:</label>
+                      <span class="text-default code_get">(点击这里获取)</span>
+                      <input type="text" class="form-control" id="codeinput" name="usercode" placeholder="验证码输入">
+                  </div>
+              </div>
+              <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+                <button type="submit" class="btn btn-primary subtn">保存</button>
+              </div>
+          </form>
+          </div>
+        </div>
+      </div>
+  </body>
+  <%- include("./footline",{name:loginname}) %>
+  <script src="../javascripts/module.js"></script>
+  <script src="../socket/socketClient.js"></script>
+  <script>
+    // 验证表单格式模板
+    
+    $(function () {
+        $('.register_form').bootstrapValidator({
+　　　　　　　　message: 'This value is not valid',
+            　feedbackIcons: {
+                　　　　　　　　valid: 'glyphicon glyphicon-ok',
+                　　　　　　　　invalid: 'glyphicon glyphicon-remove',
+                　　　　　　　　validating: 'glyphicon glyphicon-refresh'
+            　　　　　　　　   },
+            fields: {
+                username: {
+                    message: '用户名验证失败',
+                    validators: {
+                        notEmpty: {
+                            message: '用户名不能为空'
+                        },
+                        stringLength:{
+                          min:6,
+                          max:10,
+                          message:"用户名长度应在6-10位之间"
+                        }
+                    }
+                },
+                usercode: {
+                  validators:{
+                    notEmpty:{
+                    message:"验证码不能为空"
+                    }
+                  }
+                },
+                userphone:{ 
+                  validators:{
+                    notEmpty:{
+                      message:"手机号不能为空"
+                    },
+                    regexp:{
+                      regexp: /^1([38]\d|5[0-35-9]|7[3678])\d{8}$/,
+                      message:"手机号不符合要求"
+                    }
+                  }
+                },
+                userpwd:{
+                  validators:{
+                    notEmpty:{
+                      message:"密码不能为空"
+                    },
+                    stringLength:{
+                      min:6,
+                      max:10,
+                      message:"密码长度应在6-10位之间"
+                    }
+                  }
+                }
+            }
+        });
+    });
+
+    // $(".chat_input").xheditor();
+    $(pageInit);
+    function pageInit(){
+            $.extend(XHEDITOR.settings,{shortcuts:{"ctrl+enter":submitForm}});
+            // $("#ele").xheditor();
+            $(".chat_input").xheditor({   //初始化 富文件编辑框
+                html5Upload:false,
+                upMultiple:"1",
+
+                upLinkRrl:"upload.html",
+                upLinkExt:"zip,rar,txt",
+
+                upImgUrl:"/users/uploadimg",   // 图片上传的服务器  
+                upImgExt:"jpg,jpeg,gif,png",
+
+                upFlashUrl:"upload.php",
+                upFlashExt:"swf",
+
+                upMediaUrl:"upload.php",
+                upMediaExt:"wmv,avi,wma,mp3,mid"
+
+            });
+        };
+
+      function insertUpload(arrMsg){
+            console.log(arrMsg);
+            var i,msg;
+            for(var i=0;i<arrMsg.length;i++){
+                msg=arrMsg[i];
+                console.log(msg);
+                $("#uploadList").append('<option value="'+msg.id+'">'+msg.localname+'</option>')
+            }
+        };
+
+        function submitForm(){
+            $("#frmDemo").submit();
+        }
+
+    // 验证码比对
+    var codeget;
+    function checkcode(num)
+    {
+      if(!codeget||codeget!=num)
+      {
+        return false;
+      }
+      else
+      {
+        return true;
+      }
+    }
+    // 验证码简单生成
+    $(".code_get").bind("click",function(){
+      var str = "";
+      for(var i =0;i<4;i++)
+      {
+        str += Math.round(Math.random()*9);
+      }
+      codeget = str;
+      $(this).html(str);
+    })
+    $(".subtn").bind("click",function(){
+      var codeinput = $("#codeinput").val();
+      if(checkcode(codeinput))
+      {
+        if($(".register_form").data('bootstrapValidator').isValid()){
+          $.ajax({
+            url:"/users/register",
+            type:"post",
+            dataType:"json",
+            data:$(".register_form").serialize(),
+            success:function(data)
+            {
+              alert(data.msg);
+              window.location.reload();
+            }
+          })
+        }
+      }else
+      {
+        alert("验证码输入有误");
+        $("#codeinput").val("");
+      }
+        
+    })
+    
+
+
+    $("#login_btn").bind("click",function()
+    {
+      $.ajax({
+        type:"post",
+        url:"/users/login",
+        data:$("#login_form").serialize(),
+        success:function(data)
+        {
+          data = JSON.parse(data);
+          alert(data.msg);
+          window.location.reload();
+        },
+        error:function(e)
+        {
+          console.log(e);
+        }
+      });
+    })
+    function send()
+    {
+      if($(".chat_input").val())
+      {
+        ws.send($(".chat_input").val());
+        $(".chat_input").val("");
+      }
+    }
+
+    $(".chat_control .send").on("click",function(){
+      send();
+    })
+    $(".chat_control .clear").on("click",function(){
+      $(".chat_getmsg").remove();
+    })
+
+    // document.onkeyup = function(e)
+    // {
+    //   if(e.keyCode == 13)
+    //   {
+    //     send();
+    //   }
+    // }
+  </script>
+</html>

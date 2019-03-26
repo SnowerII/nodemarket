@@ -1,0 +1,12 @@
+<footer>
+<div class="home_foot">
+    <div class="container container-fluid">
+        <% if(!name){ %>
+        <p class="text-primary"> 微超市管理系统</p>
+        <% }else{ %>
+        <span class="text-primary"> 当前用户:<%- name %></span>
+        <span id="logout" class="text-danger pull-right" style="color:white;">退出</span>
+        <% } %>
+    </div>
+</div>
+</footer>
